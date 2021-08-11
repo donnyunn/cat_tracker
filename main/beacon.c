@@ -2,9 +2,6 @@
 
 static const char* TAG = "IBEACON_DEMO";
 
-#define IBEACON_SENDER      1
-#define IBEACON_RECEIVER    0
-
 #if (IBEACON_RECEIVER)
 static esp_ble_scan_params_t ble_scan_params = {
     .scan_type              = BLE_SCAN_TYPE_ACTIVE,
@@ -16,7 +13,7 @@ static esp_ble_scan_params_t ble_scan_params = {
 };
 
 #elif (IBEACON_SENDER)
-static esp_ble_adv_params_t ble_adv_params = {
+esp_ble_adv_params_t ble_adv_params = {
     .adv_int_min        = 0x20,
     .adv_int_max        = 0x40,
     .adv_type           = ADV_TYPE_NONCONN_IND,

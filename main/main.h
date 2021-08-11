@@ -21,6 +21,6 @@
 
 #include "sdkconfig.h"
 
-#include "gatts_demo.h"
+#include "gatts.h"
 
 #endif /* __MAIN_H */

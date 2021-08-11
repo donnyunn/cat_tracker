@@ -1,5 +1,5 @@
 /*
-   This code is written by Ironwalks Ltd. but it is in the Public Domain 
+   This code is written by Dulab Ltd. but it is in the Public Domain 
    (or CC0 licensed, at your option.)
 
    Unless required by applicable law or agreed to in writing, this
