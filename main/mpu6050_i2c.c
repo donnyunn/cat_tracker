@@ -110,7 +110,15 @@ static esp_err_t mpu6050_i2c_read(const REG reg, uint8_t * buf)
 
 void mpu6050_deinit(void)
 {
+    gpio_config_t io_conf;
     i2c_driver_delete(I2C_MASTER_NUM);
+
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.pin_bit_mask = (1ULL<<I2C_MASTER_SDA_IO) | (1ULL<<I2C_MASTER_SCL_IO);
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = 0;
+    io_conf.pull_down_en = 0;
+    gpio_config(&io_conf);
 }
 
 void mpu6050_read(mpu6050_t * this)

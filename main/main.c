@@ -17,16 +17,7 @@
 
 void deinitialize(void)
 {
-    gpio_config_t io_conf;
-
     mpu6050_deinit();
-
-    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
-    io_conf.pin_bit_mask = 0x7FFFFFFFFF;
-    io_conf.mode = GPIO_MODE_INPUT;
-    io_conf.pull_up_en = 0;
-    io_conf.pull_down_en = 0;
-    gpio_config(&io_conf);
 }
 
 void app_main(void)

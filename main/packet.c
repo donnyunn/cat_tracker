@@ -2,31 +2,36 @@
 
 #define TAG "PACKET"
 
-// #define DEBUG
-#ifdef DEBUG
-#define LIST_LEN 25
-#else
 #define LIST_LEN 256
-#endif
+
+#define STORAGE_NAMESPACE "storage"
 
 packet_t * this;
 
 RTC_DATA_ATTR uint16_t g_num = 0;
-RTC_DATA_ATTR uint8_t g_push_ptr = 0;
-RTC_DATA_ATTR uint8_t g_pull_ptr = 0;
-RTC_DATA_ATTR packet_t packet_list[LIST_LEN];
+RTC_DATA_ATTR uint16_t g_push_ptr = 0;
+RTC_DATA_ATTR uint16_t g_pull_ptr = 0;
 
 void packet_push(uint8_t * buf)
 {
-    packet_list[g_push_ptr].num = g_num++;
-    memcpy(packet_list[g_push_ptr].data, buf, DATA_LEN);
+    esp_err_t err;
+    nvs_handle_t handle;
+    char key[10] = {0, };
 
-    printf("pushed(%d): ", g_push_ptr);
-    printf("%04x", packet_list[g_push_ptr].num);
-    for (int i = 0; i < DATA_LEN; i++) {
-        printf("%02x", packet_list[g_push_ptr].data[i]);
-    }
-    printf("\n");
+    this->num = g_num++;
+    memcpy(this->data, buf, DATA_LEN);
+
+    err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &handle);
+    if (err != ESP_OK) ESP_LOGE(TAG, "nvs_open failed %d", err);
+
+    sprintf(key, "%d", g_push_ptr);
+    err = nvs_set_blob(handle, key, this, sizeof(packet_t));
+    if (err != ESP_OK) ESP_LOGE(TAG, "nvs_set_blob failed %d", err);
+
+    err = nvs_commit(handle);
+    if (err != ESP_OK) ESP_LOGE(TAG, "nvs_commit failed %d", err);
+
+    nvs_close(handle);
 
     if (++g_push_ptr == LIST_LEN) {
         g_push_ptr = 0;
@@ -35,21 +40,31 @@ void packet_push(uint8_t * buf)
 
 int packet_pull(uint8_t * buf) 
 {
-    uint16_t t_stamp;
+    esp_err_t err;
+    nvs_handle_t handle;
+    char key[10] = {0, };
+    packet_t temp;
     int ret = g_push_ptr >= g_pull_ptr ? 
                 (g_push_ptr - g_pull_ptr - 1) : 
                 (LIST_LEN + g_push_ptr - g_pull_ptr - 1);
+                
+    err = nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &handle);
+    if (err != ESP_OK) ESP_LOGE(TAG, "nvs_open failed %d", err);
+
+    size_t req_size = sizeof(packet_t);
+    sprintf(key, "%d", g_pull_ptr);
+    err = nvs_get_blob(handle, key, (uint8_t*)this, &req_size);
+    if (err != ESP_OK) ESP_LOGE(TAG, "nvs_set_blob this failed %d", err);
+
+    sprintf(key, "%d", g_push_ptr-1);
+    err = nvs_get_blob(handle, key, (uint8_t*)&temp, &req_size);
+    if (err != ESP_OK) ESP_LOGE(TAG, "nvs_set_blob temp failed %d", err);
     
-    t_stamp = (packet_list[g_push_ptr-1].num - packet_list[g_pull_ptr].num);
-    packet_list[g_pull_ptr].num = t_stamp;
-    memcpy(buf, (uint8_t*)(&packet_list[g_pull_ptr]), sizeof(packet_list[g_pull_ptr]));
+    nvs_close(handle);
 
-    printf("pulled(%d): ", g_pull_ptr);
-    for (int i = 0; i < sizeof(packet_list[g_pull_ptr]); i++) {
-        printf("%02x", buf[i]);
-    }
-    printf("\n");
-
+    this->num = temp.num - this->num;
+    memcpy(buf, (uint8_t*)this, sizeof(packet_t));
+    
     if (++g_pull_ptr == LIST_LEN) {
         g_pull_ptr = 0;
     }
