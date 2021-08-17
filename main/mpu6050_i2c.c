@@ -108,6 +108,11 @@ static esp_err_t mpu6050_i2c_read(const REG reg, uint8_t * buf)
     return ret;
 }
 
+void mpu6050_deinit(void)
+{
+    i2c_driver_delete(I2C_MASTER_NUM);
+}
+
 void mpu6050_read(mpu6050_t * this)
 {
     esp_err_t err;

@@ -24,7 +24,6 @@
 #include "soc/rtc.h"
 #include "deepsleep.h"
 static RTC_DATA_ATTR struct timeval sleep_enter_time;
-// const int sleep_period = 0;
 
 #ifdef CONFIG_EXAMPLE_ULP_TEMPERATURE_WAKEUP
 #if CONFIG_IDF_TARGET_ESP32
@@ -80,7 +79,7 @@ static void calibrate_touch_pad(touch_pad_t pad);
 #endif
 #endif
 
-void deepsleep_init(int sleep_period)
+void deepsleep_start(int sleep_period)
 {
     struct timeval now;
     gettimeofday(&now, NULL);

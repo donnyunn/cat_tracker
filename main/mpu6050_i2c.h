@@ -2,8 +2,9 @@
 #ifndef __MPU6050_I2C_H
 #define __MPU6050_I2C_H
 
+#include "main.h"
+
 #define MPU6050_DATA_LEN 14
-#include <stdio.h>
 typedef struct {
     union {
         uint8_t data[MPU6050_DATA_LEN];
@@ -22,7 +23,7 @@ typedef struct {
     };
 } mpu6050_t;
 
-//#include "main.h"
+void mpu6050_deinit(void);
 void mpu6050_read(mpu6050_t * this);
 void mpu6050_init(void);
 

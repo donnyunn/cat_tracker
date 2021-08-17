@@ -2,7 +2,7 @@
 
 #define TAG "PACKET"
 
-#define DEBUG 1
+// #define DEBUG
 #ifdef DEBUG
 #define LIST_LEN 25
 #else
@@ -28,13 +28,9 @@ void packet_push(uint8_t * buf)
     }
     printf("\n");
 
-#ifndef DEBUG
-    g_push_ptr++;
-#else
     if (++g_push_ptr == LIST_LEN) {
         g_push_ptr = 0;
     }
-#endif
 }
 
 int packet_pull(uint8_t * buf) 
@@ -54,13 +50,9 @@ int packet_pull(uint8_t * buf)
     }
     printf("\n");
 
-#ifndef DEBUG
-    g_pull_ptr++;
-#else
     if (++g_pull_ptr == LIST_LEN) {
         g_pull_ptr = 0;
     }
-#endif
 
     return ret;
 }
@@ -69,45 +61,3 @@ void packet_init(packet_t * packet)
 {
     this = packet;
 }
-
-// int end_i;
-// int num_imsi;
-// void packet_init(int num, int LIST_LEN, int system_time, mpu6050_t input_data, data_array_t * list_data)
-// {
-//     if (num>=LIST_LEN)
-//     {
-//         end_i = LIST_LEN-1;
-//     }
-//     else
-//     {
-//         end_i = num;
-//     }
-
-
-//     list_data[num% LIST_LEN].record_time = system_time;
-//     // int mydata.data_num = num;
-//     list_data[num% LIST_LEN].turn = num;
-//     list_data[num% LIST_LEN].AX = (short)(input_data.data[0]<<8 | input_data.data[1]);
-//     list_data[num% LIST_LEN].AY = (short)(input_data.data[2]<<8 | input_data.data[3]);
-//     list_data[num% LIST_LEN].AZ = (short)(input_data.data[4]<<8 | input_data.data[5]);
-    
-//     list_data[num% LIST_LEN].Temp = (short)(input_data.data[6]<<8 | input_data.data[7]);
-    
-//     list_data[num% LIST_LEN].GyX = (short)(input_data.data[8]<<8 | input_data.data[9]);
-//     list_data[num% LIST_LEN].GyY = (short)(input_data.data[10]<<8 | input_data.data[11]);
-//     list_data[num% LIST_LEN].GyZ = (short)(input_data.data[12]<<8 | input_data.data[13]);
-    
-//     //printf("\n%d, %d, %d, %d\n", num, mydata[num].AX, mydata[num].AY, mydata[num].AZ);
-
-//     for(int i=0; i<=(end_i); i++){
-//         num_imsi = i % LIST_LEN;
-
-
-//         printf("  %d, %d, %d, %d, %d, %d, %d, %d, %d\n", list_data[num_imsi].turn, list_data[num_imsi].record_time , list_data[num_imsi].AX , list_data[num_imsi].AY , list_data[num_imsi].AZ , list_data[num_imsi].Temp , list_data[num_imsi].GyX , list_data[num_imsi].GyY , list_data[num_imsi].GyZ );
-
-//     }
-//     if (num % LIST_LEN ==0)
-//     {
-//     ESP_LOGI("MAIN", "Loop end!");
-//     }
-// }
