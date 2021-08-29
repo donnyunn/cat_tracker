@@ -33,6 +33,12 @@ void packet_push(uint8_t * buf)
 
     nvs_close(handle);
 
+    printf("pushed(%d): ", g_push_ptr);
+    for (int i = 0; i < DATA_LEN; i++) {
+        printf("%02x", buf[i]);
+    }
+    printf("\n");
+
     if (++g_push_ptr == LIST_LEN) {
         g_push_ptr = 0;
     }
@@ -65,6 +71,7 @@ int packet_pull(uint8_t * buf)
     this->num = temp.num - this->num;
     memcpy(buf, (uint8_t*)this, sizeof(packet_t));
     
+    printf("pulled(%d)\n", g_pull_ptr);
     if (++g_pull_ptr == LIST_LEN) {
         g_pull_ptr = 0;
     }

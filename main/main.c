@@ -15,8 +15,11 @@
 
 #include "main.h"
 
+RTC_DATA_ATTR int cntBoot;
+
 void deinitialize(void)
 {
+    mpu6050_sleep();
     mpu6050_deinit();
 }
 
@@ -28,15 +31,19 @@ void app_main(void)
     /* gatt server and beacon */
     gatts_init();
 
-    /* mpu6050 IMU Sensor */
-    mpu6050_init();
-
     /* packet manager */
     packet_init(&packet);
 
-    /* record IMU data */
-    mpu6050_read(&imu);
-    packet_push(imu.data);
+    if ((cntBoot++ % 3) == 0) {
+        /* mpu6050 IMU Sensor */
+        mpu6050_init();
+
+        /* record IMU data */
+        mpu6050_read(&imu);
+        packet_push(imu.data);
+
+        deinitialize();
+    }
     
     /* GATT SERVER Advertisement */
     vTaskDelay(500 / portTICK_PERIOD_MS);
@@ -47,6 +54,5 @@ void app_main(void)
     }
 
     /* Low Power Mode */
-    deinitialize();
-    deepsleep_start(29);
+    deepsleep_start(1);
 }

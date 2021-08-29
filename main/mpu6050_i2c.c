@@ -40,7 +40,8 @@ typedef enum{
     REG_GYRO_Y_L = 0x46,
     REG_GYRO_Z_H = 0x47,
     REG_GYRO_Z_L = 0x48,
-    REG_SIGANL_PATH_RESET = 0x6B,
+    PWR_MGMT_1 = 0x6B,
+    PWR_MGMT_2 = 0x6C,
 } REG;
 
 
@@ -130,14 +131,22 @@ void mpu6050_read(mpu6050_t * this)
     }
 }
 
+void mpu6050_sleep(void)
+{
+    mpu6050_i2c_write(PWR_MGMT_1, 0x40);
+}
+
 void mpu6050_init(void)
 {
     esp_err_t err;
     
     err = i2c_master_init();
-    ESP_LOGI(TAG, "i2c master init err (%d)", err);
-
-    mpu6050_i2c_write(REG_SIGANL_PATH_RESET, 0x00);
+    if (err != ESP_OK) {
+        ESP_LOGI(TAG, "i2c master init err (%d)", err);
+    }
+    
+    mpu6050_i2c_write(PWR_MGMT_1, 0x20);
+    // err = mpu6050_i2c_write(PWR_MGMT_1, 0x00);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "%s: [mpu6050_i2c_write] fail.", __func__);
     }

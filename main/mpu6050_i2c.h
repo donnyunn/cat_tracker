@@ -5,6 +5,7 @@
 #include "main.h"
 
 #define MPU6050_DATA_LEN 14
+
 typedef struct {
     union {
         uint8_t data[MPU6050_DATA_LEN];
@@ -25,6 +26,7 @@ typedef struct {
 
 void mpu6050_deinit(void);
 void mpu6050_read(mpu6050_t * this);
+void mpu6050_sleep(void);
 void mpu6050_init(void);
 
 
