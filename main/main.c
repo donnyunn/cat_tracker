@@ -46,7 +46,7 @@ void app_main(void)
     }
     
     /* GATT SERVER Advertisement */
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(750 / portTICK_PERIOD_MS);
 
     /* Stay awake while connected */
     while (gatts_isConnected()) {
@@ -54,5 +54,5 @@ void app_main(void)
     }
 
     /* Low Power Mode */
-    deepsleep_start(1);
+    deepsleep_start(10);
 }
