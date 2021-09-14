@@ -15,18 +15,45 @@
 
 #include "main.h"
 
+#define LED_IO GPIO_NUM_19
+#define CNT_RETRY 15
+
 RTC_DATA_ATTR int cntBoot;
+
+void led_init(void)
+{
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = (1ULL<<LED_IO);
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
+}
+
+void led_deinit(void)
+{
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1ULL<<LED_IO);
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
+}
 
 void deinitialize(void)
 {
     mpu6050_sleep();
     mpu6050_deinit();
+    led_deinit();
 }
 
 void app_main(void)
 {
     mpu6050_t imu;
     packet_t packet;
+    int retry = 0;
 
     /* gatt server and beacon */
     gatts_init();
@@ -34,7 +61,10 @@ void app_main(void)
     /* packet manager */
     packet_init(&packet);
 
-    if ((cntBoot++ % 3) == 0) {
+    if ((cntBoot++ % 2) == 0) {
+        led_init();
+        gpio_set_level(LED_IO, 1);
+
         /* mpu6050 IMU Sensor */
         mpu6050_init();
 
@@ -43,16 +73,24 @@ void app_main(void)
         packet_push(imu.data);
 
         deinitialize();
+        
+        gpio_set_level(LED_IO, 0);
     }
     
     /* GATT SERVER Advertisement */
-    vTaskDelay(750 / portTICK_PERIOD_MS);
+    while (!gatts_isConnected()) {
+        if (retry++ > CNT_RETRY) {
+            break;
+        }
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
+    // vTaskDelay(600 / portTICK_PERIOD_MS);
 
     /* Stay awake while connected */
     while (gatts_isConnected()) {
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 
     /* Low Power Mode */
-    deepsleep_start(10);
+    deepsleep_start(13);
 }

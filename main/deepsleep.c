@@ -57,7 +57,7 @@ void deepsleep_start(int sleep_period)
 
     const int wakeup_time_sec = sleep_period;
     printf("Enabling timer wakeup, %ds\n", wakeup_time_sec);
-    esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);
+    esp_sleep_enable_timer_wakeup(wakeup_time_sec*1000000);
 
 #ifdef CONFIG_EXAMPLE_EXT1_WAKEUP
     const int ext_wakeup_pin_1 = 2;

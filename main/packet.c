@@ -2,7 +2,7 @@
 
 #define TAG "PACKET"
 
-#define LIST_LEN 256
+#define LIST_LEN 20000
 
 #define STORAGE_NAMESPACE "storage"
 
