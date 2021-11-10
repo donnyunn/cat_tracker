@@ -17,6 +17,8 @@ static const char *TAG = "mpu6050_i2c";
 #define I2C_MASTER_TX_BUF_DISABLE 0                           /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_RX_BUF_DISABLE 0                           /*!< I2C master doesn't need buffer */
 
+#define MPU6050_INT_PIN 23
+
 #define MPU6050_ADDR 0x68
 #define WRITE_BIT I2C_MASTER_WRITE              /*!< I2C master write */
 #define READ_BIT I2C_MASTER_READ                /*!< I2C master read */
@@ -60,9 +62,9 @@ static esp_err_t i2c_master_init(void)
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
     conf.sda_io_num = I2C_MASTER_SDA_IO;
-    conf.sda_pullup_en = GPIO_PULLUP_DISABLE;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
     conf.scl_io_num = I2C_MASTER_SCL_IO;
-    conf.scl_pullup_en = GPIO_PULLUP_DISABLE;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
     conf.clk_flags = 0;
     i2c_param_config(i2c_master_port, &conf);
@@ -115,8 +117,8 @@ void mpu6050_deinit(void)
     i2c_driver_delete(I2C_MASTER_NUM);
 
     io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
-    io_conf.pin_bit_mask = (1ULL<<I2C_MASTER_SDA_IO) | (1ULL<<I2C_MASTER_SCL_IO);
-    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1ULL<<I2C_MASTER_SDA_IO) | (1ULL<<I2C_MASTER_SCL_IO) | (1ULL<<MPU6050_INT_PIN);
+    io_conf.mode = GPIO_MODE_DISABLE;
     io_conf.pull_up_en = 0;
     io_conf.pull_down_en = 0;
     gpio_config(&io_conf);
@@ -139,7 +141,14 @@ void mpu6050_sleep(void)
 void mpu6050_init(void)
 {
     esp_err_t err;
-    
+    gpio_config_t io_conf;    
+    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.pin_bit_mask = (1ULL<<I2C_MASTER_SDA_IO) | (1ULL<<I2C_MASTER_SCL_IO) | (1ULL<<MPU6050_INT_PIN);
+    io_conf.mode = GPIO_MODE_INPUT | GPIO_MODE_DEF_OD;
+    io_conf.pull_up_en = 1;
+    io_conf.pull_down_en = 0;
+    gpio_config(&io_conf);
+
     err = i2c_master_init();
     if (err != ESP_OK) {
         ESP_LOGI(TAG, "i2c master init err (%d)", err);
