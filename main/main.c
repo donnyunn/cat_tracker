@@ -16,6 +16,7 @@
 #include "main.h"
 
 #define LED_IO GPIO_NUM_19
+
 #define LED_ON() gpio_set_level(LED_IO, 0)
 #define LED_OFF() gpio_set_level(LED_IO, 1)
 
@@ -52,22 +53,47 @@ void main_deinit(void)
     gpio_config(&io_conf);
 }
 
+void led_init(void)
+{
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = (1ULL<<LED_IO);
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
+}
+
+void led_deinit(void)
+{
+    gpio_config_t io_conf;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pin_bit_mask = (1ULL<<LED_IO);
+    io_conf.pull_down_en = 0;
+    io_conf.pull_up_en = 0;
+    gpio_config(&io_conf);
+}
+
 void deinitialize(void)
 {
     mpu6050_sleep();
     mpu6050_deinit();
+    led_deinit();
 }
 
 void app_main(void)
 {
     mpu6050_t imu;
     packet_t packet;
+    int retry = 0;
 
     main_init();
 
     switch (deepsleep_get_wakeup()) {
         case ESP_SLEEP_WAKEUP_TIMER:
             LED_ON();
+
 
             /* gatt server and beacon */
             gatts_init();
