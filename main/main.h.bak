@@ -24,6 +24,7 @@
 #include "esp_err.h"
 #include "soc/rtc.h"
 #include "driver/rtc_io.h"
+#include "driver/gpio.h"
 
 #include "gatts.h"
 #include "mpu6050_i2c.h"

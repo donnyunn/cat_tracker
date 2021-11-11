@@ -60,7 +60,7 @@ esp_sleep_source_t deepsleep_get_wakeup(void)
 void deepsleep_start(int sleep_period, int gpio_num)
 {
     const int wakeup_time_sec = sleep_period;
-
+    
     if (sleep_period != 0) {
         // printf("Enabling timer wakeup, %ds\n", wakeup_time_sec);
         esp_sleep_enable_timer_wakeup(wakeup_time_sec * 1000000);

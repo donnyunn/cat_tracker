@@ -136,6 +136,7 @@ void mpu6050_read(mpu6050_t * this)
 void mpu6050_sleep(void)
 {
     mpu6050_i2c_write(PWR_MGMT_1, 0x40);
+    // mpu6050_i2c_write(PWR_MGMT_1, 0x21);
 }
 
 void mpu6050_init(void)
@@ -154,13 +155,10 @@ void mpu6050_init(void)
         ESP_LOGI(TAG, "i2c master init err (%d)", err);
     }
     
-    mpu6050_i2c_write(PWR_MGMT_1, 0x20);
-    // err = mpu6050_i2c_write(PWR_MGMT_1, 0x00);
+    // err = mpu6050_i2c_write(PWR_MGMT_1, 0x20);
+    // err = mpu6050_i2c_write(PWR_MGMT_2, 0x40);
+    err = mpu6050_i2c_write(PWR_MGMT_1, 0x00);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "%s: [mpu6050_i2c_write] fail.", __func__);
     }
-
-    // xTaskCreate(Sensor_assemble, "Sensor_assemble", 2048, (void *) 0, 10, NULL);
-
-
 }
